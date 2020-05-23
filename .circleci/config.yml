@@ -12,7 +12,7 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: cd app && ./manage.py test
+          command: cd app && python manage.py test && flake8
           name: Test
 
 workflows:
