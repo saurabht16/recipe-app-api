@@ -17,4 +17,3 @@ deploy:
   on:
     repo: saurabht16/recipe-app-api
     branch: RA-2-Recipe-API-TDD
-  run: "cd recipe-api-app && python manage.py runserver 0.0.0.0:8000"
