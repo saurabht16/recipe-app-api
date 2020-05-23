@@ -1,12 +1,19 @@
 language: python
 python:
-  - "3.8"
-
+- '3.8'
 services:
-  - docker
-
+- docker
 before_script:
-  - pip install docker-compose
-
+- pip install docker-compose
 script:
-  - docker-compose run app sh -c "python manage.py test && flake8"
+- docker-compose run app sh -c "python manage.py test && flake8"
+deploy:
+  provider: heroku
+  buildpack: python
+  api_key:
+    secure: QpongpMw9cKS+zG1w3L8KspNksbdkrM7WJ7KDptHXkfzdmFk2rweogy5T163trGFCgeuDjfll+ZmYEbmc0zRIrz1uMRfVBrpooSmjqC6q9d+RtalS9vBuLW+v9qCf09pOnP2usH5NwS8uzqGvGeQQbZugDRt31UuXHjReGdN4eShTDJc2TQhcn40CdqU283bPx4Feb4+s2w7S965wJNZB3kk4o/NreDZ+PPRfF18+b+PHZllnWfrDgjGjmzMUeHyX7JTQQQvnMGkZ2ksv7MIeqTqBPOftQsTfFIbS4zLPREVgNdUsGo/xXldLRdCoVOOhcBtLJhmriGkggcqtY7YUSvyMwhnicyYfzd0t8PTWDj3Rs2ogI+3LLzQO1DmWsS/dMQQCZielSSZvgWAFtUMiUZ3lMWQqr6UY/+U7aRiVEqI8oANoF1agyC6jLlE2Y9q9rIc8JF8mJiBMKpW6Ebxbe1TrWl8fKt0chanvEsSGBnrJ8+H7Nz+2qe7hvviLayh6QEhgUFfqnf7ZvZenF/pVGQVnTpOqBc2nxKbRrwvue9+3LNIncsJ6IIvigzb3T0KAYrvCosNB7GX+GEU00Om107EIjqYHgGC/r4vvGXvjxkiSTGGblHNVq/Pge346W5DBO806FpR6MCPwHG55P5HCHeVq8F1qq1rFqHoKpxKs2E=
+  strategy: git
+  app: recipe-app-api
+  on:
+    repo: saurabht16/recipe-app-api
+    branch: RA-2-Recipe-API-TDD
