@@ -24,6 +24,20 @@ class UserManager(BaseUserManager):
 
         return user
 
+    def create_superuser(self, email, password):
+        """
+        Create and saves new superuser
+        :param email: Email Field
+        :param password: Password Field
+        :return: new superuser
+        """
+        superuser = self.create_user(email, password)
+        superuser.is_staff = True
+        superuser.is_superuser = True
+        superuser.save(using=self._db)
+
+        return superuser
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
