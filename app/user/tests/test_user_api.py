@@ -7,6 +7,7 @@ from rest_framework import status
 
 
 CREATE_USER_URL = reverse('user:create')
+TOKEN_URL = reverse('user:token')
 
 
 def create_user(**params):
@@ -20,6 +21,11 @@ class PublicUserApiTests(TestCase):
 
     def setUp(self) -> None:
         self.client = APIClient()
+        self.payload = {
+            'email': 'test@djangoappdev.com',
+            'password': 'testpass',
+            'name': 'Test Name'
+        }
 
     def test_create_valid_user_success(self):
         """
@@ -72,3 +78,48 @@ class PublicUserApiTests(TestCase):
             email=payload['email']
         ).exists()
         self.assertFalse(user_exist)
+
+    def test_create_token_for_user(self):
+        """
+        Test that the token is created for the User
+        :return: Boolean result for Tests
+        """
+        create_user(**self.payload)
+        res = self.client.post(TOKEN_URL, self.payload)
+
+        self.assertIn('token', res.data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_create_token_invalid_credentials(self):
+        """
+        Test that token is not created when invalid credentials are given
+        :return: Boolean Test Result
+        """
+        create_user(**self.payload)
+        incorrect_payload = {
+            'email': 'test@djangoappdev.com',
+            'password': 'wrong',
+            'name': 'Test Name'
+        }
+        res = self.client.post(TOKEN_URL, incorrect_payload)
+        self.assertNotIn('token', res.data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_no_user(self):
+        """
+        Test that token is not created is user does not exist
+        :return: Boolean Test Result
+        """
+        res = self.client.post(TOKEN_URL, self.payload)
+
+        self.assertNotIn('token', res.data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_missing_field(self):
+        """
+        Test that email and password are required
+        :return: Boolean Test Result
+        """
+        res = self.client.post(TOKEN_URL, {'email': 'test', 'password': ''})
+        self.assertNotIn('token', res.data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
