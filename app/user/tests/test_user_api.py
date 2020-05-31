@@ -6,9 +6,9 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 
-CREATE_USER_URL = reverse('user:create')
-TOKEN_URL = reverse('user:token')
-ME_URL = reverse('user:me')
+CREATE_USER_URL = reverse("user:create")
+TOKEN_URL = reverse("user:token")
+ME_URL = reverse("user:me")
 
 
 def create_user(**params):
@@ -23,9 +23,9 @@ class PublicUserApiTests(TestCase):
     def setUp(self) -> None:
         self.client = APIClient()
         self.payload = {
-            'email': 'test@djangoappdev.com',
-            'password': 'testpass',
-            'name': 'Test Name'
+            "email": "test@djangoappdev.com",
+            "password": "testpass",
+            "name": "Test Name",
         }
 
     def test_create_valid_user_success(self):
@@ -34,16 +34,16 @@ class PublicUserApiTests(TestCase):
         :return: Test Result for Pass or Fail
         """
         payload = {
-            'email': 'test@djangoappdev.com',
-            'password': 'testpass',
-            'name': 'Test Name'
+            "email": "test@djangoappdev.com",
+            "password": "testpass",
+            "name": "Test Name",
         }
         res = self.client.post(CREATE_USER_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         user = get_user_model().objects.get(**res.data)
-        self.assertTrue(user.check_password(payload['password']))
-        self.assertNotIn('password', res.data)
+        self.assertTrue(user.check_password(payload["password"]))
+        self.assertNotIn("password", res.data)
 
     def test_user_exists(self):
         """
@@ -51,9 +51,9 @@ class PublicUserApiTests(TestCase):
         :return: Boolean Test Result
         """
         payload = {
-            'email': 'test@djangoappdev.com',
-            'password': 'testpass',
-            'name': 'Test Name'
+            "email": "test@djangoappdev.com",
+            "password": "testpass",
+            "name": "Test Name",
         }
         create_user(**payload)
 
@@ -67,17 +67,15 @@ class PublicUserApiTests(TestCase):
         :return: Boolean Test Result
         """
         payload = {
-            'email': 'test@djangoappdev.com',
-            'password': 'pw',
-            'name': 'Test Name'
+            "email": "test@djangoappdev.com",
+            "password": "pw",
+            "name": "Test Name",
         }
         res = self.client.post(CREATE_USER_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
-        user_exist = get_user_model().objects.filter(
-            email=payload['email']
-        ).exists()
+        user_exist = get_user_model().objects.filter(email=payload["email"]).exists()
         self.assertFalse(user_exist)
 
     def test_create_token_for_user(self):
@@ -88,7 +86,7 @@ class PublicUserApiTests(TestCase):
         create_user(**self.payload)
         res = self.client.post(TOKEN_URL, self.payload)
 
-        self.assertIn('token', res.data)
+        self.assertIn("token", res.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_create_token_invalid_credentials(self):
@@ -98,12 +96,12 @@ class PublicUserApiTests(TestCase):
         """
         create_user(**self.payload)
         incorrect_payload = {
-            'email': 'test@djangoappdev.com',
-            'password': 'wrong',
-            'name': 'Test Name'
+            "email": "test@djangoappdev.com",
+            "password": "wrong",
+            "name": "Test Name",
         }
         res = self.client.post(TOKEN_URL, incorrect_payload)
-        self.assertNotIn('token', res.data)
+        self.assertNotIn("token", res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_token_no_user(self):
@@ -113,7 +111,7 @@ class PublicUserApiTests(TestCase):
         """
         res = self.client.post(TOKEN_URL, self.payload)
 
-        self.assertNotIn('token', res.data)
+        self.assertNotIn("token", res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_token_missing_field(self):
@@ -121,8 +119,8 @@ class PublicUserApiTests(TestCase):
         Test that email and password are required
         :return: Boolean Test Result
         """
-        res = self.client.post(TOKEN_URL, {'email': 'test', 'password': ''})
-        self.assertNotIn('token', res.data)
+        res = self.client.post(TOKEN_URL, {"email": "test", "password": ""})
+        self.assertNotIn("token", res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_retrieve_user_unauthorized(self):
@@ -143,10 +141,8 @@ class PrivateUserAPITests(TestCase):
     def setUp(self) -> None:
 
         self.user = create_user(
-                        email='test@djangoappdev.com',
-                        password='testpass',
-                        name='Test Name'
-                    )
+            email="test@djangoappdev.com", password="testpass", name="Test Name"
+        )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
@@ -158,10 +154,7 @@ class PrivateUserAPITests(TestCase):
         res = self.client.get(ME_URL)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, {
-            'name': self.user.name,
-            'email': self.user.email
-        })
+        self.assertEqual(res.data, {"name": self.user.name, "email": self.user.email})
 
     def test_post_me_not_allowed(self):
         """
@@ -177,10 +170,10 @@ class PrivateUserAPITests(TestCase):
         Test updating the user profile for authenticated user
         :return:
         """
-        payload = {'name': 'new name', 'password': 'newpassword123'}
+        payload = {"name": "new name", "password": "newpassword123"}
 
         res = self.client.patch(ME_URL, payload)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.name, payload['name'])
-        self.assertTrue(self.user.check_password(payload['password']))
+        self.assertEqual(self.user.name, payload["name"])
+        self.assertTrue(self.user.check_password(payload["password"]))
         self.assertTrue(res.status_code, status.HTTP_200_OK)
