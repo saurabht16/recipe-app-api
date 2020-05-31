@@ -75,7 +75,8 @@ class PublicUserApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
-        user_exist = get_user_model().objects.filter(email=payload["email"]).exists()
+        user_exist = get_user_model().objects.filter(
+            email=payload["email"]).exists()
         self.assertFalse(user_exist)
 
     def test_create_token_for_user(self):
@@ -141,7 +142,8 @@ class PrivateUserAPITests(TestCase):
     def setUp(self) -> None:
 
         self.user = create_user(
-            email="test@djangoappdev.com", password="testpass", name="Test Name"
+            email="test@djangoappdev.com",
+            password="testpass", name="Test Name"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -154,7 +156,8 @@ class PrivateUserAPITests(TestCase):
         res = self.client.get(ME_URL)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, {"name": self.user.name, "email": self.user.email})
+        self.assertEqual(res.data, {"name": self.user.name,
+                                    "email": self.user.email})
 
     def test_post_me_not_allowed(self):
         """
