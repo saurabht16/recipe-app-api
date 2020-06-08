@@ -70,3 +70,20 @@ class Tag(models.Model):
         :return: self.name
         """
         return self.name
+
+
+class Ingredient(models.Model):
+    """
+    Ingredient to be used in recipe
+    """
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             )
+
+    def __str__(self):
+        """
+        STR representation of Ingredient
+        :return: self.name
+        """
+        return self.name
